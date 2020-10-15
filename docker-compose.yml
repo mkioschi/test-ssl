@@ -8,8 +8,8 @@ services:
     ports:
       - 80:80
     volumes:
-      - .docker/server/logs/:/var/log/nginx/
       - .docker/server/conf.d/:/etc/nginx/conf.d/
+      - .docker/server/logs/:/var/log/nginx/
     links:
       - app
     env_file: .env
@@ -27,7 +27,7 @@ services:
     ports:
       - 9000:9000
     volumes:
-      - ./:/var/www:cached
+      - ./:/var/www
     env_file: .env
     restart: on-failure
     tty: true
