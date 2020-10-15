@@ -1,0 +1,15 @@
+version: "3.5"
+services:
+  server:
+    container_name: server
+    build:
+      context: .docker/server
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    volumes:
+      - .docker/server/logs/:/var/log/nginx/
+      - .docker/server/conf.d/:/etc/nginx/conf.d/
+    env_file: .env
+    restart: on-failure
+    tty: true

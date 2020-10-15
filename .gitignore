@@ -1,0 +1,25 @@
+# Environment variables
+.env
+
+### Docker ###
+/.docker/server/logs/*
+
+### Mantém diretórios ###
+!**/.gitkeep
+
+### Visual Studio Code ###
+/.vscode/*
+/!.vscode/settings.json
+/!.vscode/tasks.json
+/!.vscode/launch.json
+/!.vscode/extensions.json
+
+### Globais ###
+/.local
+/.history
+/.idea
+/.cache
+/.bash_history
+**/*.bak
+**/*.swp
+**/.DS_store
