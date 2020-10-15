@@ -10,7 +10,7 @@ services:
     volumes:
       - .docker/server/conf.d/:/etc/nginx/conf.d/
       - .docker/server/logs/:/var/log/nginx/
-    links:
+    depends_on:
       - app
     env_file: .env
     restart: on-failure
