@@ -17,6 +17,7 @@ services:
     tty: true
 
   app:
+    container_name: app
     build:
       context: .docker/app
       dockerfile: Dockerfile
