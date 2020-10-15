@@ -3,6 +3,8 @@
 
 ### Docker ###
 /.docker/server/logs/*
+/.docker/ssl/certbot-etc/*
+/.docker/ssl/certbot-var/*
 
 ### Mantém diretórios ###
 !**/.gitkeep
