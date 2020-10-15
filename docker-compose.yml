@@ -10,6 +10,23 @@ services:
     volumes:
       - .docker/server/logs/:/var/log/nginx/
       - .docker/server/conf.d/:/etc/nginx/conf.d/
+    links:
+      - app
+    env_file: .env
+    restart: on-failure
+    tty: true
+
+  app:
+    build:
+      context: .docker/app
+      dockerfile: Dockerfile
+      args:
+        - UID=${UID}
+        - GID=${GID}
+    ports:
+      - 9000:9000
+    volumes:
+      - ./:/var/www:cached
     env_file: .env
     restart: on-failure
     tty: true
