@@ -40,12 +40,6 @@ WORKDIR /var/www
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-RUN curl -sL https://deb.nodesource.com/setup_12.x -o nodesource_setup.sh && \
-    bash nodesource_setup.sh && \
-    apt-get install -y nodejs && \
-    npm install --global yarn && \
-    npm install --global gulp-cli
-
 RUN rm -rf /var/www/html && \
     chown -R ${UID}:${GID} /var/www
 
