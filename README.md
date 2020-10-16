@@ -34,14 +34,16 @@ Adicione o registro abaixo no arquivo `/etc/hosts`.
 127.0.0.1   example.local
 ```
 
-## Instalação do certificado SSL:
+## Instalação do certificado SSL
 
 Para instalar o certificado SSL é necessário a variável de ambiente `ENV=prod` estar definida.
 
-#### 1. Desligue todos serviços do Docker:
+#### 1. Reinicie todos serviços do Docker:
+
+_É de extrema importância rodar o comando `make up` com a variável `ENV=prod` e o arquivo de host sem SSL na pasta `sites-enabled`. Pois a geração do certificado pelo Let's Encrypt exige um teste com o domínio sem o redirect para HTTPS._
 
 ```console
-$ make down
+$ make down && make up
 ```
 
 #### 2. Arquivo de host com o SSL:
@@ -58,6 +60,26 @@ E substitua pelo arquivo com os certificados SSL (`.ssl.conf`).
 $ cp .docker/server/sites-available/example.com.ssl.conf .docker/server/sites-enabled/
 ```
 
+Por fim, reinicie os serviços novamente:
+
+```console
+$ make down && make up
+```
+
+## Renovar Certificados
+
+#### 1. Torne o arquivo `ssl_renew.sh` executável:
+
+```console
+$ chmod +x ssl_renew.sh
+```
+
+#### 2. Adicione a execução intermitente desse arquivo no crontab:
+
+```console
+0 12 * * * /var/www/meu_projeto/.docker/ssl/bin/ssl_renew.sh >> /var/log/cron.log 2>&1
+```
+
 ## Comandos Make disponíveis
 
 Lista todos comandos Make disponíveis na aplicação:
@@ -65,3 +87,7 @@ Lista todos comandos Make disponíveis na aplicação:
 ```console
 $ make help
 ```
+
+## Fontes:
+
+- https://www.digitalocean.com/community/tutorials/how-to-secure-a-containerized-node-js-application-with-nginx-let-s-encrypt-and-docker-compose-pt#passo-6-%E2%80%94-renovando-certificados
