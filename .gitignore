@@ -3,6 +3,7 @@
 
 ### Docker ###
 /.docker/server/logs/*
+/.docker/server/sites-enabled/*
 /.docker/ssl/certbot-etc/*
 /.docker/ssl/certbot-var/*
 

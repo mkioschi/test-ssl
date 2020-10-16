@@ -11,6 +11,7 @@ services:
     volumes:
       - .docker/ssl/certbot-etc:/etc/letsencrypt
       - .docker/ssl/certbot-var:/var/lib/letsencrypt
+      - .docker/server/sites-enabled/:/etc/nginx/sites-enabled/
       - .docker/server/logs/:/var/log/nginx/
       - ./:/var/www
     depends_on:
@@ -19,18 +20,18 @@ services:
     restart: on-failure
     tty: true
 
-  ssl:
-    container_name: ssl
-    build:
-      context: .docker/ssl
-      dockerfile: Dockerfile
-    volumes:
-      - .docker/ssl/certbot-etc:/etc/letsencrypt
-      - .docker/ssl/certbot-var:/var/lib/letsencrypt
-      - ./public:/var/www/public
-    depends_on:
-      - server
-    command: certonly --webroot --webroot-path=/var/www/public --email dev@agenciaecode.com.br --agree-tos --no-eff-email --force-renewal -d gestor.lojasdomanao.com.br
+  # ssl:
+  #   container_name: ssl
+  #   build:
+  #     context: .docker/ssl
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - .docker/ssl/certbot-etc:/etc/letsencrypt
+  #     - .docker/ssl/certbot-var:/var/lib/letsencrypt
+  #     - ./public:/var/www/public
+  #   depends_on:
+  #     - server
+  #   command: certonly --webroot --webroot-path=/var/www/public --email dev@agenciaecode.com.br --agree-tos --no-eff-email --force-renewal -d gestor.lojasdomanao.com.br
 
   app:
     container_name: app
