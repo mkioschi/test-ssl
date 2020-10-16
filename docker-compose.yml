@@ -11,7 +11,7 @@ services:
     volumes:
       - .docker/ssl/certbot-etc:/etc/letsencrypt
       - .docker/ssl/certbot-var:/var/lib/letsencrypt
-      - .docker/server/sites-enabled/:/etc/nginx/sites-enabled/
+      - .docker/server/sites-enabled/:/etc/nginx/conf.d/
       - .docker/server/logs/:/var/log/nginx/
       - ./:/var/www
     depends_on:
