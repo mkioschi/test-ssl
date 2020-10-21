@@ -12,8 +12,7 @@ docker_compose=
 dominios=
 email=
 staging=0
-rsa_key_size=1024
-# rsa_key_size=4096
+rsa_key_size=4096
 
 # Popula as variáveis com as opções passadas na execução
 while [ -n "$1" ]
