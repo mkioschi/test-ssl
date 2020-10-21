@@ -12,7 +12,7 @@ docker_compose=
 dominios=
 email=
 staging=0
-regex="([^www.].+)"
+rsa_key_size=4096
 
 # Popula as variáveis com as opções passadas na execução
 while [ -n "$1" ]
@@ -87,14 +87,20 @@ fi
 
 # Certificados fake
 for dominio in ${dominios[@]}; do
+    diretorio_dominio="$diretorio/live/$dominio"
 
-  echo $dominio; echo;
+    mkdir -p $diretorio_dominio
 
+    if [ ! -e "$diretorio_dominio/cert.pem" ]; then
+        echo "[i] Criando certificado fake para o domínio $dominio...";
+
+        path="/etc/letsencrypt/live/$dominio"
+
+        $docker_compose run --rm --entrypoint "openssl req -x509 -nodes -newkey rsa:$rsa_key_size -days 1 -keyout '$path/privkey.pem' -out '$path/fullchain.pem' -subj '/CN=localhost'" certbot
+    fi
 done
 
-exit
-echo;
-echo $docker_compose;
-echo $dominios;
-echo $email;
-echo $staging;
+# Reinicia o serviço do Nginx (server)
+echo "[i] Reiniciando nginx...";
+
+$docker_compose up -d server && $docker_compose restart server

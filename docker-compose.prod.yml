@@ -9,8 +9,8 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - .docker/server/letsencrypt/:/etc/letsencrypt
-      - .docker/server/conf.d/:/etc/nginx/
+      - .docker/server/letsencrypt/:/etc/letsencrypt/
+      - .docker/server/conf.d/nginx.conf:/etc/nginx/nginx.conf
       - .docker/server/sites-enabled/:/etc/nginx/sites-enabled/
       - .docker/server/logs/:/var/log/nginx/
       - ./:/var/www
@@ -20,13 +20,14 @@ services:
     restart: unless-stopped
     command: /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'"
 
-  certobot:
-    container_name: certobot
+  certbot:
+    container_name: certbot
     build:
-      context: .docker/certobot
+      context: .docker/certbot
       dockerfile: Dockerfile
     volumes:
-      - .docker/server/letsencrypt/:/etc/letsencrypt
+      - .docker/server/letsencrypt/:/etc/letsencrypt/
+      - .docker/certbot/logs/:/var/log/letsencrypt/
       - ./public:/var/www/public
     depends_on:
       - server

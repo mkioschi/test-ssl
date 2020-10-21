@@ -2,8 +2,9 @@
 .env
 
 ### Docker ###
-/.docker/server/logs/*
-/.docker/server/letsencrypt/*
+/.docker/certbot/logs/
+/.docker/server/logs/
+/.docker/server/letsencrypt/
 
 ### Mantém diretórios ###
 !**/.gitkeep
