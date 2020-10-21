@@ -12,7 +12,8 @@ docker_compose=
 dominios=
 email=
 staging=0
-rsa_key_size=4096
+rsa_key_size=1024
+# rsa_key_size=4096
 
 # Popula as variáveis com as opções passadas na execução
 while [ -n "$1" ]
@@ -69,21 +70,18 @@ fi
 
 # Cria diretórios necessários, caso não existam (-p)
 mkdir -p "$diretorio/nginx-options"
-mkdir -p "$diretorio/dhparam"
 
 # Parâmetros TLS recomendados
 options_ssl_nginx="$diretorio/nginx-options/options-ssl-nginx.conf"
-ssl_dhparams="$diretorio/dhparam/ssl-dhparams.pem"
 
 if [ ! -e $options_ssl_nginx ]; then
 	echo "[i] Baixando configurações SSL recomendadas...";
 	curl -s "https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf" > $options_ssl_nginx
 fi
 
-if [ ! -e $ssl_dhparams ]; then
-	echo "[i] Baixando certificado Diffie–Hellman...";
-	curl -s "https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem" > $ssl_dhparams
-fi
+# Parâmetros Diffie–Hellman
+echo "[i] Criando certificado Diffie–Hellman...";
+$docker_compose run --rm --entrypoint "openssl dhparam -out '/etc/letsencrypt/ssl-dhparams.pem' $rsa_key_size" certbot
 
 # Certificados fake
 for dominio in ${dominios[@]}; do
@@ -97,6 +95,8 @@ for dominio in ${dominios[@]}; do
         path="/etc/letsencrypt/live/$dominio"
 
         $docker_compose run --rm --entrypoint "openssl req -x509 -nodes -newkey rsa:$rsa_key_size -days 1 -keyout '$path/privkey.pem' -out '$path/fullchain.pem' -subj '/CN=localhost'" certbot
+
+        cp -p "$diretorio_dominio/fullchain.pem" "$diretorio_dominio/chain.pem"
     fi
 done
 
