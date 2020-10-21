@@ -88,6 +88,8 @@ Lista todos comandos Make disponíveis na aplicação:
 $ make help
 ```
 
-## Fontes:
+## Referências:
 
 - https://www.digitalocean.com/community/tutorials/how-to-secure-a-containerized-node-js-application-with-nginx-let-s-encrypt-and-docker-compose-pt#passo-6-%E2%80%94-renovando-certificados
+- https://gist.github.com/cecilemuller/a26737699a7e70a7093d4dc115915de8
+- https://letsencrypt.org/docs/rate-limits/

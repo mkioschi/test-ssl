@@ -1,4 +1,4 @@
-version: "3.5"
+version: "3.7"
 services:
   server:
     container_name: server
@@ -8,14 +8,15 @@ services:
     ports:
       - 80:80
     volumes:
-      - .docker/server/sites-enabled/:/etc/nginx/conf.d/
+      - .docker/server/conf.d/:/etc/nginx/
+      - .docker/server/sites-enabled/:/etc/nginx/sites-enabled/
       - .docker/server/logs/:/var/log/nginx/
       - ./:/var/www
     depends_on:
       - app
     env_file: .env
-    restart: on-failure
-    tty: true
+    restart: unless-stopped
+    command: /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'"
 
   app:
     container_name: app
@@ -30,5 +31,4 @@ services:
     volumes:
       - ./:/var/www
     env_file: .env
-    restart: on-failure
-    tty: true
+    restart: unless-stopped

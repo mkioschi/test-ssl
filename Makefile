@@ -10,53 +10,68 @@ export
 
 # Verifica qual ambiente está setado no arquivo .env.
 ifeq ($(ENV), dev)
-DOCKER_COMPOSE_PREFIX=docker-compose -f docker-compose.dev.yml
+DOCKER_COMPOSE=docker-compose -f docker-compose.dev.yml
 else ifeq ($(ENV), test)
-DOCKER_COMPOSE_PREFIX=docker-compose -f docker-compose.test.yml
+DOCKER_COMPOSE=docker-compose -f docker-compose.test.yml
 else ifeq ($(ENV), prod)
-DOCKER_COMPOSE_PREFIX=docker-compose -f docker-compose.prod.yml
+DOCKER_COMPOSE=docker-compose -f docker-compose.prod.yml
 else
 $(error Variável "ENV" não definida no arquivo .env ou inválida.)
 endif
-
-# "docker-compose exec" do serviço 'ofertei_server'
-SERVER_EXEC_PREFIX=$(DOCKER_COMPOSE_PREFIX) exec ofertei_server bash -c
 
 # ------------------------------------------------------------------------------
 # Comandos Make
 # ------------------------------------------------------------------------------
 
-# Serviço ofertei_server -------------------------------------------------------
+# Certbot --------------------------------------------------------------
+
+register-ssl-staging:
+	@chmod +x .docker/bin/register-ssl.sh
+	@sudo .docker/bin/register-ssl.sh \
+									--docker-compose "$(DOCKER_COMPOSE)" \
+									--dominios "$(SSL_DOMINIOS)" \
+									--email $(SSL_EMAIL) \
+									--staging
+
+register-ssl:
+	@chmod +x .docker/bin/register-ssl.sh
+	@sudo .docker/bin/register-ssl.sh \
+									--docker-compose "$(DOCKER_COMPOSE)" \
+									--dominios "$(SSL_DOMINIOS)" \
+									--email $(SSL_EMAIL)
+
+generate-certbot-test: up-server restart-server
+	$(DOCKER_COMPOSE) run --rm --entrypoint "certbot certonly --webroot -w /var/www/public -d $(DOMAIN) --email $(EMAIL) --agree-tos --no-eff-email --force-renewal --staging --non-interactive" certbot
+
+generate-certbot: up-server restart-server
+	$(DOCKER_COMPOSE) run --rm --entrypoint "certbot certonly --webroot -w /var/www/public -d $(DOMAIN) --email $(EMAIL) --agree-tos --no-eff-email --force-renewal --non-interactive" certbot
+
+# Serviço server -------------------------------------------------------
 
 bash-server:
-	$(DOCKER_COMPOSE_PREFIX) exec ofertei_server bash
+	$(DOCKER_COMPOSE) exec server bash
 
 up-server:
-	$(DOCKER_COMPOSE_PREFIX) up -d ofertei_server 
+	$(DOCKER_COMPOSE) up -d server
 
 restart-server:
-	$(DOCKER_COMPOSE_PREFIX) restart ofertei_server 
+	$(DOCKER_COMPOSE) restart server
 
 # Comandos globais/Docker  -----------------------------------------------------
 
 config:
-	$(DOCKER_COMPOSE_PREFIX) config
+	$(DOCKER_COMPOSE) config
 
-build:
-	$(DOCKER_COMPOSE_PREFIX) build
+up-test: down
+	$(DOCKER_COMPOSE) up --build --force-recreate
 
-up:
-	$(DOCKER_COMPOSE_PREFIX) up -d
+up: down
+	$(DOCKER_COMPOSE) up -d --build --force-recreate
 
 down:
-	$(DOCKER_COMPOSE_PREFIX) down
+	$(DOCKER_COMPOSE) down
 
-down-v:
-	$(DOCKER_COMPOSE_PREFIX) down -v
-
-restart: down up ps
-
-recreate: down-v build up
+restart: down up
 
 install:
 
@@ -69,13 +84,11 @@ help:
 	@echo "    build                    Executa o build em todos serviços."
 	@echo "    up                       Roda todos serviços."
 	@echo "    down                     Para todos serviços."
-	@echo "    down-v                   Para todos serviços limpando dados do volume."
 	@echo "    restart                  Reinicia todos serviços."
 	@echo "    recreate                 Executa o build nos serviços apagando os dados dos volumes."
 	@echo "    build                    Executa o build de todos serviços."
 	@echo "    install                  Instala as dependencias de todos Dependency Managers da aplicação."
 	@echo ""
-	@echo "  Comandos para o serviço 'ofertei_server':"
-	@echo "    bash-server              Entra no bash do serviço 'ofertei_server'."
-	@echo "    restart-server           Reinicia o serviço 'ofertei_server'."
+	@echo "  Comandos para o serviço 'server':"
+	@echo "    bash-server              Entra no bash do serviço 'server'."
 	@echo ""

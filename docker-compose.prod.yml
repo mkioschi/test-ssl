@@ -1,4 +1,4 @@
-version: "3.5"
+version: "3.7"
 services:
   server:
     container_name: server
@@ -9,29 +9,28 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - .docker/ssl/certbot-etc:/etc/letsencrypt
-      - .docker/ssl/certbot-var:/var/lib/letsencrypt
-      - .docker/server/sites-enabled/:/etc/nginx/conf.d/
+      - .docker/server/letsencrypt/:/etc/letsencrypt
+      - .docker/server/conf.d/:/etc/nginx/
+      - .docker/server/sites-enabled/:/etc/nginx/sites-enabled/
       - .docker/server/logs/:/var/log/nginx/
       - ./:/var/www
     depends_on:
       - app
     env_file: .env
-    restart: on-failure
-    tty: true
+    restart: unless-stopped
+    command: /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'"
 
-  ssl:
-    container_name: ssl
+  certobot:
+    container_name: certobot
     build:
-      context: .docker/ssl
+      context: .docker/certobot
       dockerfile: Dockerfile
     volumes:
-      - .docker/ssl/certbot-etc:/etc/letsencrypt
-      - .docker/ssl/certbot-var:/var/lib/letsencrypt
+      - .docker/server/letsencrypt/:/etc/letsencrypt
       - ./public:/var/www/public
     depends_on:
       - server
-    command: certonly --webroot --webroot-path=/var/www/public --email dev@agenciaecode.com.br --agree-tos --no-eff-email --force-renewal -d gestor.lojasdomanao.com.br
+    entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;"
 
   app:
     container_name: app
@@ -46,5 +45,4 @@ services:
     volumes:
       - ./:/var/www
     env_file: .env
-    restart: on-failure
-    tty: true
+    restart: unless-stopped
