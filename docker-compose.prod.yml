@@ -14,6 +14,7 @@ services:
       - .docker/server/logs/:/var/log/nginx/
       - .docker/server/letsencrypt/:/etc/letsencrypt/
       - .docker/server/ssl-conf/:/etc/nginx/ssl-conf/
+      - .docker/server/acme-challenge/:/usr/share/certbot/
       - ./:/var/www
     depends_on:
       - app
@@ -29,7 +30,7 @@ services:
     volumes:
       - .docker/server/letsencrypt/:/etc/letsencrypt/
       - .docker/certbot/logs/:/var/log/letsencrypt/
-      # - ./public:/var/www/public
+      - .docker/server/acme-challenge/:/var/www/certbot
     depends_on:
       - server
     entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;"
