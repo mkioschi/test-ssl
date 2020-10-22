@@ -72,12 +72,14 @@ if [ -z "$email" ]; then
 fi
 
 # Parâmetros Diffie–Hellman
-if [ -e "$diretorio_dominio/cert.pem" ]; then
+ssl_dhparams=/etc/letsencrypt/ssl-dhparams.pem
+
+if [ -e "$ssl_dhparams" ]; then
     echo; echo "[i] Certificado Diffie–Hellman já existe."; echo;
 else
     echo; echo "[i] Criando certificado Diffie–Hellman..."; echo;
 
-    $docker_compose run --rm --entrypoint "openssl dhparam -out '/etc/letsencrypt/ssl-dhparams.pem' $rsa_key_size" certbot
+    $docker_compose run --rm --entrypoint "openssl dhparam -out '$ssl_dhparams' $rsa_key_size" certbot
 fi
 
 # Cria certificados fake
