@@ -14,7 +14,7 @@ docker_compose=
 dominios=
 email=
 staging=0
-rsa_key_size=1024
+rsa_key_size=4096
 staging_arg=
 dominios_args=
 
