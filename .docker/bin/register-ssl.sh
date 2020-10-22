@@ -53,6 +53,9 @@ do
     shift
 done
 
+echo $docker_compose;
+exit
+
 # Valida variáveis obrigatórias
 if [ -z "$docker_compose" ]; then
     echo; echo "[error] O prefixo do docker-compose é obrigatório."; echo;
