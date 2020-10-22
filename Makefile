@@ -36,12 +36,6 @@ register-ssl:
 								--dominios "$(SSL_DOMINIOS)" \
 								--email $(SSL_EMAIL)
 
-generate-certbot-test: up-server restart-server
-	$(DOCKER_COMPOSE) run --rm --entrypoint "certbot certonly --webroot -w /var/www/public -d $(DOMAIN) --email $(EMAIL) --agree-tos --no-eff-email --force-renewal --staging --non-interactive" certbot
-
-generate-certbot: up-server restart-server
-	$(DOCKER_COMPOSE) run --rm --entrypoint "certbot certonly --webroot -w /var/www/public -d $(DOMAIN) --email $(EMAIL) --agree-tos --no-eff-email --force-renewal --non-interactive" certbot
-
 # Demais Comandos --------------------------------------------------------------
 
 up-test: down

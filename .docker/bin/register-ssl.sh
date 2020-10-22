@@ -119,6 +119,6 @@ for dominio in ${dominios[@]}; do
     fi
 done
 
-$docker_compose run --rm --entrypoint "certbot certonly $dominios_args $staging_arg --email $email --rsa-key-size $rsa_key_size --agree-tos --no-eff-email --force-renewal --non-interactive" certbot
+$docker_compose run --rm --entrypoint "certbot certonly $dominios_args $staging_arg --email $email --rsa-key-size $rsa_key_size --agree-tos --no-eff-email --force-renewal" certbot
 
 echo $dominios_args;
