@@ -2,7 +2,7 @@
 
 # Verifica se o script está sendo executado como root
 if [ "$EUID" -ne 0 ]; then
-	echo; echo "[Error] Execute o $0 como root."; echo;
+	echo; echo "[error] Execute o $0 como root."; echo;
 	exit
 fi
 
@@ -12,7 +12,9 @@ docker_compose=
 dominios=
 email=
 staging=0
-rsa_key_size=4096
+rsa_key_size=1024
+staging_arg=
+dominios_args=
 
 # Popula as variáveis com as opções passadas na execução
 while [ -n "$1" ]
@@ -44,7 +46,7 @@ do
 
         # Opções não mapeadas
         *)
-            echo; echo "[Error] A opção $1 é desconhecida."; echo;
+            echo; echo "[error] A opção $1 é desconhecida."; echo;
             exit 1
         ;;
     esac
@@ -53,17 +55,17 @@ done
 
 # Valida variáveis obrigatórias
 if [ -z "$docker_compose" ]; then
-    echo; echo "[Error] O prefixo do docker-compose é obrigatório."; echo;
+    echo; echo "[error] O prefixo do docker-compose é obrigatório."; echo;
     exit 1
 fi
 
 if [ -z "$dominios" ]; then
-    echo; echo "[Error] Ao menos um domínio é obrigatório."; echo;
+    echo; echo "[error] Ao menos um domínio é obrigatório."; echo;
     exit 1
 fi
 
 if [ -z "$email" ]; then
-    echo; echo "[Error] O email é obrigatório."; echo;
+    echo; echo "[error] O email é obrigatório."; echo;
     exit 1
 fi
 
@@ -71,7 +73,7 @@ fi
 echo; echo "[i] Criando certificado Diffie–Hellman..."; echo;
 $docker_compose run --rm --entrypoint "openssl dhparam -out '/etc/letsencrypt/ssl-dhparams.pem' $rsa_key_size" certbot
 
-# Certificados fake
+# Cria certificados fake
 for dominio in ${dominios[@]}; do
     diretorio_dominio="$diretorio/live/$dominio"
 
@@ -92,3 +94,30 @@ done
 echo; echo "[i] Reiniciando nginx..."; echo;
 
 $docker_compose up -d server && $docker_compose restart server
+
+# Gera certificados ------------------------------------------------------------
+
+# Habilita o modo staging
+if [ $staging = 1 ]; then staging_arg="--staging"; fi
+
+# Monta argumentos dos domínios
+for dominio in ${dominios[@]}; do
+    diretorio_dominio="$diretorio/live/$dominio"
+
+    if [ -e "$diretorio_dominio/cert.pem" ]; then
+        echo; echo "[i] O certificado do domínio $dominio já existe."; echo;
+    else
+        echo; echo "[i] Apagando certificado fake do domínio $dominio..."; echo;
+
+        # Remove diretório do certificado fake
+        rm -rf $diretorio_dominio
+
+        # Adiciona o domínio nos args de criação de certificado
+    	dominios_args="$dominios_args -d $dominio"
+    fi
+done
+
+$docker_compose run --rm --entrypoint "certbot certonly $domain_args $staging_arg --email $email --rsa-key-size $rsa_key_size --agree-tos --no-eff-email --force-renewal --non-interactive" certbot
+# $docker_compose run --rm --entrypoint "certbot certonly --webroot -w /var/www/public $domain_args $staging_arg --email $email --rsa-key-size $rsa_key_size --agree-tos --no-eff-email --force-renewal --non-interactive" certbot
+
+echo $dominios_args;
