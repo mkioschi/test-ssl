@@ -34,7 +34,7 @@ register-ssl:
 	@sudo .docker/bin/register-ssl.sh \
 								--docker-compose "$(DOCKER_COMPOSE)" \
 								--dominios "$(SSL_DOMINIOS)" \
-								--email $(SSL_EMAIL)
+								--email $(SSL_EMAIL) \
 								--flush
 
 # Demais Comandos --------------------------------------------------------------
