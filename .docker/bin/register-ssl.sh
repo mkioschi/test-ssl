@@ -6,6 +6,8 @@ if [ "$EUID" -ne 0 ]; then
 	exit
 fi
 
+# TODO Verificar versão do docker-compose para 
+
 # Inicializa as variáveis
 diretorio=.docker/server/letsencrypt
 docker_compose=
