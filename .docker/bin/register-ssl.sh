@@ -67,19 +67,8 @@ if [ -z "$email" ]; then
     exit 1
 fi
 
-# Cria diretórios necessários, caso não existam (-p)
-mkdir -p "$diretorio/nginx-options"
-
-# Parâmetros TLS recomendados
-options_ssl_nginx="$diretorio/nginx-options/options-ssl-nginx.conf"
-
-if [ ! -e $options_ssl_nginx ]; then
-	echo "[i] Baixando configurações SSL recomendadas...";
-	curl -s "https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf" > $options_ssl_nginx
-fi
-
 # Parâmetros Diffie–Hellman
-echo "[i] Criando certificado Diffie–Hellman...";
+echo; echo "[i] Criando certificado Diffie–Hellman..."; echo;
 $docker_compose run --rm --entrypoint "openssl dhparam -out '/etc/letsencrypt/ssl-dhparams.pem' $rsa_key_size" certbot
 
 # Certificados fake
@@ -89,7 +78,7 @@ for dominio in ${dominios[@]}; do
     mkdir -p $diretorio_dominio
 
     if [ ! -e "$diretorio_dominio/cert.pem" ]; then
-        echo "[i] Criando certificado fake para o domínio $dominio...";
+        echo; echo "[i] Criando certificado fake para o domínio $dominio..."; echo;
 
         path="/etc/letsencrypt/live/$dominio"
 
@@ -100,6 +89,6 @@ for dominio in ${dominios[@]}; do
 done
 
 # Reinicia o serviço do Nginx (server)
-echo "[i] Reiniciando nginx...";
+echo; echo "[i] Reiniciando nginx..."; echo;
 
 $docker_compose up -d server && $docker_compose restart server
