@@ -107,7 +107,7 @@ $docker_compose up -d server && $docker_compose restart server
 # Gera certificados ------------------------------------------------------------
 
 # Habilita o modo staging
-if [ $staging = 1 ]; then staging_arg="--staging"; fi
+if [ "$staging" = 1 ]; then staging_arg="--staging"; fi
 
 # Monta argumentos dos domínios
 for dominio in ${dominios[@]}; do
@@ -129,3 +129,8 @@ done
 echo; echo "[i] Criando certificados."; echo;
 
 $docker_compose run --rm --entrypoint "certbot certonly --webroot -w /var/www/certbot $dominios_args $staging_arg --email $email --rsa-key-size $rsa_key_size --agree-tos --no-eff-email --force-renewal" certbot
+
+# Desliga todos serviços
+echo; echo "[i] Desligando serviços..."; echo;
+
+$docker_compose down
