@@ -17,6 +17,7 @@ staging=0
 rsa_key_size=4096
 staging_arg=
 dominios_args=
+flush_certs=0
 
 # Popula as variáveis com as opções passadas na execução
 while [ -n "$1" ]
@@ -43,6 +44,12 @@ do
         # Define se é staging
         -s | --staging)
             staging=1
+        shift
+        ;;
+
+        # Define se é staging
+        -f | --flush)
+            flush_certs=1
         shift
         ;;
 
@@ -111,10 +118,10 @@ if [ "$staging" = 1 ]; then staging_arg="--staging"; fi
 for dominio in ${dominios[@]}; do
     diretorio_dominio="$diretorio/live/$dominio"
 
-    if [ -e "$diretorio_dominio/cert.pem" ]; then
+    if [ -e "$diretorio_dominio/cert.pem" ] && [ "$flush_certs" = 0 ]; then
         echo; echo "[i] O certificado do domínio $dominio já existe."; echo;
     else
-        echo; echo "[i] Apagando certificado fake do domínio $dominio..."; echo;
+        echo; echo "[i] Apagando certificado do domínio $dominio..."; echo;
 
         # Remove diretório do certificado fake
         rm -rf $diretorio_dominio

@@ -35,6 +35,7 @@ register-ssl:
 								--docker-compose "$(DOCKER_COMPOSE)" \
 								--dominios "$(SSL_DOMINIOS)" \
 								--email $(SSL_EMAIL)
+								--flush
 
 # Demais Comandos --------------------------------------------------------------
 
