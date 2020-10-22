@@ -73,6 +73,7 @@ fi
 
 # Parâmetros Diffie–Hellman
 echo; echo "[i] Criando certificado Diffie–Hellman..."; echo;
+
 $docker_compose run --rm --entrypoint "openssl dhparam -out '/etc/letsencrypt/ssl-dhparams.pem' $rsa_key_size" certbot
 
 # Cria certificados fake
@@ -119,6 +120,6 @@ for dominio in ${dominios[@]}; do
     fi
 done
 
-$docker_compose run --rm --entrypoint "certbot certonly --webroot -w /usr/share/certbot $dominios_args $staging_arg --email $email --rsa-key-size $rsa_key_size --agree-tos --no-eff-email --force-renewal" certbot
+echo; echo "[i] Criando certificados."; echo;
 
-echo $dominios_args;
+$docker_compose run --rm --entrypoint "certbot certonly --webroot -w /var/www/certbot $dominios_args $staging_arg --email $email --rsa-key-size $rsa_key_size --agree-tos --no-eff-email --force-renewal" certbot
