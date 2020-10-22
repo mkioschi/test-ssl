@@ -126,9 +126,14 @@ for dominio in ${dominios[@]}; do
     fi
 done
 
-echo; echo "[i] Criando certificados."; echo;
+# Valida variáveis obrigatórias
+if [ -z "$dominios_args" ]; then
+    echo; echo "[i] Nenhum certificado para criar."; echo;
+else
+    echo; echo "[i] Criando certificados."; echo;
 
-$docker_compose run --rm --entrypoint "certbot certonly --webroot -w /var/www/certbot $dominios_args $staging_arg --email $email --rsa-key-size $rsa_key_size --agree-tos --no-eff-email --force-renewal" certbot
+    $docker_compose run --rm --entrypoint "certbot certonly --webroot -w /var/www/certbot $dominios_args $staging_arg --email $email --rsa-key-size $rsa_key_size --agree-tos --no-eff-email --force-renewal" certbot
+fi
 
 # Desliga todos serviços
 echo; echo "[i] Desligando serviços..."; echo;
