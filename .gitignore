@@ -3,9 +3,9 @@
 
 ### Docker ###
 /.docker/certbot/logs/
-/.docker/server/logs/
-/.docker/server/letsencrypt/
-/.docker/server/acme-challenge/
+/.docker/nginx/logs/
+/.docker/nginx/letsencrypt/
+/.docker/nginx/acme-challenge/
 
 ### Mantém diretórios ###
 !**/.gitkeep

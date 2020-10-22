@@ -1,0 +1,36 @@
+version: "3.5"
+services:
+  nginx:
+    container_name: nginx
+    build:
+      context: .docker/nginx
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - .docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - .docker/nginx/sites-enabled/:/etc/nginx/sites-enabled/
+      - .docker/nginx/logs/:/var/log/nginx/
+      - .docker/nginx/letsencrypt/:/etc/letsencrypt/
+      - .docker/nginx/ssl-conf/:/etc/nginx/ssl-conf/
+      - .docker/nginx/acme-challenge/:/usr/share/certbot/
+      - ./:/var/www
+    depends_on:
+      - app
+    env_file: .env
+    restart: unless-stopped
+    command: /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'"
+
+  certbot:
+    container_name: certbot
+    build:
+      context: .docker/certbot
+      dockerfile: Dockerfile
+    volumes:
+      - .docker/nginx/letsencrypt/:/etc/letsencrypt/
+      - .docker/nginx/acme-challenge/:/var/www/certbot/
+      - .docker/certbot/logs/:/var/log/letsencrypt/
+    depends_on:
+      - server
+    entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;"
