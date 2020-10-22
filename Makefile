@@ -39,10 +39,10 @@ register-ssl:
 # Demais Comandos --------------------------------------------------------------
 
 up-test: down
-	$(DOCKER_COMPOSE) up --build --force-recreate
+	$(DOCKER_COMPOSE) up
 
 up: down
-	$(DOCKER_COMPOSE) up -d --build --force-recreate
+	$(DOCKER_COMPOSE) up -d
 
 down:
 	$(DOCKER_COMPOSE) down
