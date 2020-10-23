@@ -5,12 +5,12 @@
 !/www/html/
 
 ### Docker ###
-/.docker/certbot/logs/*
-/.docker/nginx/logs/*
-/.docker/nginx/letsencrypt/*
-/.docker/nginx/acme-challenge/*
-/.docker/nginx/sites-enabled/*
+/.docker/certbot/logs/
+/.docker/nginx/logs/
+/.docker/nginx/letsencrypt/
+/.docker/nginx/acme-challenge/
 
+/.docker/nginx/sites-enabled/*
 !/.docker/nginx/sites-enabled/exemplo.com.br.conf
 !/.docker/nginx/sites-enabled/default.conf
 

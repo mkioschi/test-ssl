@@ -9,7 +9,7 @@ fi
 # TODO Verificar versão do docker-compose para 
 
 # Inicializa as variáveis
-diretorio=.docker/server/letsencrypt
+diretorio=.docker/nginx/letsencrypt
 docker_compose=
 dominios=
 email=
@@ -23,12 +23,6 @@ flush_certs=0
 while [ -n "$1" ]
 do
     case "$1" in
-        # Define o prefixo do docker-compose
-        -dc | --docker-compose)
-            docker_compose=("$2")
-        shift
-        ;;
-
         # Define os domínios
         -d | --dominios)
             dominios=("$2")
@@ -63,11 +57,6 @@ do
 done
 
 # Valida variáveis obrigatórias
-if [ -z "$docker_compose" ]; then
-    echo; echo "[error] O prefixo do docker-compose é obrigatório."; echo;
-    exit 1
-fi
-
 if [ -z "$dominios" ]; then
     echo; echo "[error] Ao menos um domínio é obrigatório."; echo;
     exit 1
@@ -84,7 +73,7 @@ if [ -e "$diretorio/ssl-dhparams.pem" ]; then
 else
     echo; echo "[i] Criando certificado Diffie–Hellman..."; echo;
 
-    $docker_compose run --rm --entrypoint "openssl dhparam -out '/etc/letsencrypt/ssl-dhparams.pem' $rsa_key_size" certbot
+    docker-compose run --rm --entrypoint "openssl dhparam -out '/etc/letsencrypt/ssl-dhparams.pem' $rsa_key_size" certbot
 fi
 
 # Cria certificados fake
@@ -98,16 +87,16 @@ for dominio in ${dominios[@]}; do
 
         path="/etc/letsencrypt/live/$dominio"
 
-        $docker_compose run --rm --entrypoint "openssl req -x509 -nodes -newkey rsa:$rsa_key_size -days 1 -keyout '$path/privkey.pem' -out '$path/fullchain.pem' -subj '/CN=localhost'" certbot
+        docker-compose run --rm --entrypoint "openssl req -x509 -nodes -newkey rsa:$rsa_key_size -days 1 -keyout '$path/privkey.pem' -out '$path/fullchain.pem' -subj '/CN=localhost'" certbot
 
         cp -p "$diretorio_dominio/fullchain.pem" "$diretorio_dominio/chain.pem"
     fi
 done
 
-# Reinicia o serviço do Nginx (server)
+# Reinicia o serviço do Nginx
 echo; echo "[i] Reiniciando nginx..."; echo;
 
-$docker_compose up -d server && $docker_compose restart server
+docker-compose up -d nginx && docker-compose restart nginx
 
 # Gera certificados ------------------------------------------------------------
 
@@ -137,10 +126,10 @@ if [ -z "$dominios_args" ]; then
 else
     echo; echo "[i] Criando certificados."; echo;
 
-    $docker_compose run --rm --entrypoint "certbot certonly --webroot -w /var/www/certbot $dominios_args $staging_arg --email $email --rsa-key-size $rsa_key_size --agree-tos --no-eff-email --force-renewal" certbot
+    docker-compose run --rm --entrypoint "certbot certonly --webroot -w /var/www/certbot $dominios_args $staging_arg --email $email --rsa-key-size $rsa_key_size --agree-tos --no-eff-email --force-renewal" certbot
 fi
 
 # Desliga todos serviços
 echo; echo "[i] Desligando serviços..."; echo;
 
-$docker_compose down
+docker-compose down
