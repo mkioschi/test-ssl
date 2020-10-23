@@ -27,13 +27,13 @@ register-ssl:
 
 # Demais Comandos --------------------------------------------------------------
 
-up-test: down
-	$(DOCKER_COMPOSE) up
+start-test: 
+	docker-compose up
 
-up: down
-	$(DOCKER_COMPOSE) up -d
+start: 
+	docker-compose up -d
 
-down:
-	$(DOCKER_COMPOSE) down
+stop:
+	docker-compose down
 
-restart: down up
+restart: stop start
